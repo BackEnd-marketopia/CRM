@@ -14,8 +14,8 @@ class TaskCalendarWidget extends FullCalendarWidget
     public function fetchEvents(array $fetchInfo): array
     {
         $tasks = Task::query()
-            ->where('due_date', '>=', $fetchInfo['start'])
-            ->where('due_date', '<=', $fetchInfo['end'])
+            ->where('due_date_time', '>=', $fetchInfo['start'])
+            ->where('due_date_time', '<=', $fetchInfo['end'])
             ->when(!auth()->user()->isAdmin(), function ($query) {
                 return $query->where('user_id', auth()->id());
             })
