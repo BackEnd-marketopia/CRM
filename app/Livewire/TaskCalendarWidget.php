@@ -26,8 +26,8 @@ class TaskCalendarWidget extends FullCalendarWidget
                         EventData::make()
                             ->id('task-' . $task->getKey())
                             ->title(strip_tags($task->description))
-                            ->start($task->due_date)
-                            ->end($task->due_date),
+                            ->start($task->due_date_time)
+                            ->end($task->due_date_time),
                         function ($event) use ($task) {
                             if (auth()->user()->isAdmin()) {
                                 $event->url(TaskResource::getUrl('edit', [$task->getKey()]));
