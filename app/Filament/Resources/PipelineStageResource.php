@@ -15,8 +15,12 @@ use Filament\Tables\Table;
 class PipelineStageResource extends Resource
 {
     protected static ?string $model = PipelineStage::class;
-
+    protected static ?string $title = "Status";
     protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationLabel = 'Status';
+    protected static ?string $modelLabel = 'Statu';
+
+
 
     public static function form(Form $form): Form
     {
@@ -55,7 +59,7 @@ class PipelineStageResource extends Resource
                     ->icon('heroicon-o-star')
                     ->hidden(fn($record) => $record->is_default)
                     ->requiresConfirmation(function (Tables\Actions\Action $action, $record) {
-                        $action->modalDescription('Are you sure you want to set this as the default pipeline stage?');
+                        $action->modalDescription('Are you sure you want to set this as the default Status?');
                         $action->modalHeading('Set "' . $record->name . '" as Default');
 
                         return $action;
@@ -72,8 +76,8 @@ class PipelineStageResource extends Resource
                     if ($record->customers()->count() > 0) {
                         Notification::make()
                             ->danger()
-                            ->title('Pipeline Stage is in use')
-                            ->body('Pipeline Stage is in use by customers.')
+                            ->title('Status is in use')
+                            ->body('Status is in use by customers.')
                             ->send();
 
                         return;
@@ -81,8 +85,8 @@ class PipelineStageResource extends Resource
 
                     Notification::make()
                         ->success()
-                        ->title('Pipeline Stage deleted')
-                        ->body('Pipeline Stage has been deleted.')
+                        ->title('Status deleted')
+                        ->body('Status has been deleted.')
                         ->send();
 
                     $record->delete();

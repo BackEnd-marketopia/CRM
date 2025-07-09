@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PipelineStage extends Model
 {
+        
     protected $fillable = [
         'name',
         'position',

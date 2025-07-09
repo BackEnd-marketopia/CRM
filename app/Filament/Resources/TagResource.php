@@ -17,6 +17,10 @@ class TagResource extends Resource
     protected static ?string $model = Tag::class;
 
     protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $title = "Labels";
+    protected static ?string $navigationLabel = 'Labels';
+    protected static ?string $modelLabel = 'Label';
+
 
     public static function form(Form $form): Form
     {

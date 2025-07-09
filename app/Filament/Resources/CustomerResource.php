@@ -185,7 +185,7 @@ class CustomerResource extends Resource
                         ->toggleable(),
                 Tables\Columns\TextColumn::make('leadSource.name'),
                 Tables\Columns\TextColumn::make('pipelineStage.name')
-                ->label('Labels'),
+                ->label('Status'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -208,7 +208,7 @@ class CustomerResource extends Resource
                         ->hidden(fn($record) => $record->trashed()),
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
-                    Tables\Actions\Action::make('Move to Stage')
+                    Tables\Actions\Action::make('Change Status')
                         ->hidden(fn($record) => $record->trashed())
                         ->icon('heroicon-m-pencil-square')
                         ->form([
@@ -257,7 +257,8 @@ class CustomerResource extends Resource
                                 ->title('Task created successfully')
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn () => auth()->user()?->isAdmin()),
                         Tables\Actions\Action::make('Change Rejection Status')
                             ->icon('heroicon-o-x-circle')
                             ->hidden(fn($record) => $record->trashed())

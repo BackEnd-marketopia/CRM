@@ -9,6 +9,7 @@ use Filament\Resources\Pages\EditRecord;
 class EditPipelineStage extends EditRecord
 {
     protected static string $resource = PipelineStageResource::class;
+    protected static ?string $title = 'Edit Status';
 
     protected function getHeaderActions(): array
     {

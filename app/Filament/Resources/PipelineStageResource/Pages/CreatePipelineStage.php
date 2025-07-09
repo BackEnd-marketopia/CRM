@@ -10,6 +10,7 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePipelineStage extends CreateRecord
 {
     protected static string $resource = PipelineStageResource::class;
+    protected static ?string $title = 'Create Status';
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
