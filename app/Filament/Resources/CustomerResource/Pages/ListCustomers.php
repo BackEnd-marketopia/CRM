@@ -16,7 +16,7 @@ class ListCustomers extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
             return [
                 Actions\CreateAction::make(),
             ];
@@ -29,12 +29,12 @@ class ListCustomers extends ListRecords
     {
         $tabs = [];
 
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs['all'] = Tab::make('All Customers')
             ->badge(Customer::count());
         }
 
-        if (!auth()->user()->isAdmin()) {
+        if (auth()->user()->isSales()) {
             $tabs['my'] = Tab::make('My Customers')
             ->badge(Customer::where('employee_id', auth()->id())->count())
             ->modifyQueryUsing(function ($query) {
@@ -45,7 +45,7 @@ class ListCustomers extends ListRecords
 
         $pipelineStages = PipelineStage::orderBy('position')->withCount([
             'customers' => function ($query) {
-            if (!auth()->user()->isAdmin()) {
+            if (auth()->user()->isSales()) {
                 $query->where('employee_id', auth()->id());
             }
             }
@@ -55,7 +55,7 @@ class ListCustomers extends ListRecords
             $tabs[str($pipelineStage->name)->slug()->toString()] = Tab::make($pipelineStage->name)
             ->badge($pipelineStage->customers_count)
             ->modifyQueryUsing(function ($query) use ($pipelineStage) {
-                if (!auth()->user()->isAdmin()) {
+                if (auth()->user()->isSales()) {
                 return $query->where('pipeline_stage_id', $pipelineStage->id)
                          ->where('employee_id', auth()->id());
                 }

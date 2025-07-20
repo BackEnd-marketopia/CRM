@@ -116,7 +116,6 @@ class NoteResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('Complete')
                     ->hidden(fn(Note $record) => $record->is_completed)
                     ->icon('heroicon-m-check-badge')
@@ -130,7 +129,10 @@ class NoteResource extends Resource
                             ->title('Note marked as completed')
                             ->success()
                             ->send();
-                    })
+                    }),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -156,12 +158,23 @@ class NoteResource extends Resource
     }  
     
     
-    // protected function mutateFormDataBeforeCreate(array $data): array
-    // {
-    //     if (! auth()->user()->isAdmin()) {
-    //         $data['created_by'] = auth()->id();
-    //     }
+       public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
 
-    //     return $data;
-    // }
+      public static function canView(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
 }

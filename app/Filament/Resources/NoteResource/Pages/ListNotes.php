@@ -23,7 +23,7 @@ class ListNotes extends ListRecords
     {
         $tabs = [];
 
-        if (!auth()->user()->isAdmin()) {
+        if (auth()->user()->isSales()) {
             $tabs[] = Tab::make('My Notes')
                 ->badge(Note::where('created_by', auth()->id())->count())
                 ->modifyQueryUsing(function ($query) {
@@ -31,18 +31,18 @@ class ListNotes extends ListRecords
                 });
         }
 
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs[] = Tab::make('All Notes')
             ->badge(Note::count());
         }
 
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs[] = Tab::make('Completed Notes')
             ->badge(Note::where('is_completed', true)->count())
             ->modifyQueryUsing(function ($query) {
                 return $query->where('is_completed', true);
             });
-        }elseif (!auth()->user()->isAdmin()) {
+        }elseif (auth()->user()->isSales()) {
             $tabs[] = Tab::make('Completed Notes')
                 ->badge(Note::where('is_completed', true)->where('created_by', auth()->id())->count())
                 ->modifyQueryUsing(function ($query) {
@@ -51,13 +51,13 @@ class ListNotes extends ListRecords
         }
 
 
-        if(auth()->user()->isAdmin()){
+        if(auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs[] = Tab::make('Incomplete Notes')
             ->badge(Note::where('is_completed', false)->count())
             ->modifyQueryUsing(function ($query) {
                 return $query->where('is_completed', false);
             });
-        }elseif (!auth()->user()->isAdmin()){
+        }elseif (auth()->user()->isSales()) {
             $tabs[] = Tab::make('Incomplete Notes')
             ->badge(Note::where('is_completed', false)->where('created_by', auth()->id())->count())
             ->modifyQueryUsing(function ($query) {

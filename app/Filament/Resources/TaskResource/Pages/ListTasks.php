@@ -26,7 +26,7 @@ class ListTasks extends ListRecords
     {
         $tabs = [];
 
-        if (!auth()->user()->isAdmin()) {
+        if (auth()->user()->isSales()) {
             $tabs[] = Tab::make('My Tasks')
                 ->badge(Task::where('user_id', auth()->id())->count())
                 ->modifyQueryUsing(function ($query) {
@@ -34,18 +34,18 @@ class ListTasks extends ListRecords
                 });
         }
 
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs[] = Tab::make('All Tasks')
             ->badge(Task::count());
         }
 
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs[] = Tab::make('Completed Tasks')
             ->badge(Task::where('is_completed', true)->count())
             ->modifyQueryUsing(function ($query) {
                 return $query->where('is_completed', true);
             });
-        }elseif (!auth()->user()->isAdmin()) {
+        }elseif (auth()->user()->isSales()) {
             $tabs[] = Tab::make('Completed Tasks')
                 ->badge(Task::where('is_completed', true)->where('user_id', auth()->id())->count())
                 ->modifyQueryUsing(function ($query) {
@@ -54,17 +54,17 @@ class ListTasks extends ListRecords
         }
 
 
-        if(auth()->user()->isAdmin()){
+        if(auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
         $tabs[] = Tab::make('Incomplete Tasks')
             ->badge(Task::where('is_completed', false)->count())
             ->modifyQueryUsing(function ($query) {
                 return $query->where('is_completed', false);
             });
-        }elseif (!auth()->user()->isAdmin()){
+        }elseif (auth()->user()->isSales()){
             $tabs[] = Tab::make('Incomplete Tasks')
             ->badge(Task::where('is_completed', false)->where('user_id', auth()->id())->count())
             ->modifyQueryUsing(function ($query) {
-                    return $query->where('is_completed', true)->where('user_id', auth()->id());
+                    return $query->where('is_completed', false)->where('user_id', auth()->id());
             });
          }
          

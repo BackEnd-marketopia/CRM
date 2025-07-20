@@ -81,7 +81,6 @@ class TaskResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('Complete')
                     ->hidden(fn(Task $record) => $record->is_completed)
                     ->icon('heroicon-m-check-badge')
@@ -95,7 +94,9 @@ class TaskResource extends Resource
                             ->title('Task marked as completed')
                             ->success()
                             ->send();
-                    })
+                    }),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -124,11 +125,23 @@ class TaskResource extends Resource
         ];
     }
 
+      public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
+
+      public static function canView(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
+    }
+
     public static function canEdit(Model $record): bool
     {
-        if (!auth()->user()->isAdmin()) {
-            return false;
-        }
-        return true;
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
     }
 }

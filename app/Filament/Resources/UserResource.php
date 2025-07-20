@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -36,7 +37,6 @@ class UserResource extends Resource
                 Forms\Components\DateTimePicker::make('email_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    // https://filamentphp.com/docs/3.x/forms/advanced#auto-hashing-password-field
                     ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
                     ->dehydrated(fn(?string $state): bool => filled($state))
                     ->required(fn(string $operation): bool => $operation === 'create')
@@ -68,9 +68,10 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
@@ -91,4 +92,25 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager();
+    }
+
+      public static function canView(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
 }

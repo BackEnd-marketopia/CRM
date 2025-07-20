@@ -62,6 +62,34 @@ class User extends Authenticatable implements FilamentUser
         return $this->role->name === 'Admin';
     }
 
+     public function isSales(): bool
+    {
+        if (!$this->relationLoaded('role')) {
+            $this->load('role');
+        }
+
+        return $this->role->name === 'Employee';
+    }
+
+
+    public function isDataEntry(): bool
+    {
+        if (!$this->relationLoaded('role')) {
+            $this->load('role');
+        }
+
+        return $this->role->name === 'DataEntry';
+    }
+
+    public function isDataEntryManager(): bool
+    {
+        if (!$this->relationLoaded('role')) {
+            $this->load('role');
+        }
+
+        return $this->role->name === 'DataEntryManager';
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

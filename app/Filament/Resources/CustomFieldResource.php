@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CustomFieldResource extends Resource
@@ -71,4 +72,24 @@ class CustomFieldResource extends Resource
             'edit' => Pages\EditCustomField::route('/{record}/edit'),
         ];
     }    
+
+       public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
+    }
+
+      public static function canView(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
+    }
 }

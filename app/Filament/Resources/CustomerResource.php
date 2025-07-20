@@ -44,7 +44,7 @@ class CustomerResource extends Resource
                         Forms\Components\Select::make('employee_id')
                             ->options(User::where('role_id', Role::where('name', 'Employee')->first()->id)->pluck('name', 'id'))
                     ])
-                    ->hidden(!auth()->user()->isAdmin()),
+                    ->hidden(auth()->user()->isSales()),
                 Forms\Components\Section::make('Customer Details')
                     ->schema([
                         Forms\Components\TextInput::make('first_name')
@@ -154,7 +154,7 @@ class CustomerResource extends Resource
                     ->searchable(['first_name', 'last_name']),
                 Tables\Columns\TextColumn::make('employee.name')
                     ->label('Sales')
-                    ->hidden(!auth()->user()->isAdmin())
+                    ->hidden(auth()->user()->isSales())
                     ->searchable(),
                 // Tables\Columns\TextColumn::make('email')
                 //     ->searchable(),
@@ -203,7 +203,7 @@ class CustomerResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()
                         ->hidden(fn($record) => $record->trashed()),
                     Tables\Actions\DeleteAction::make(),
@@ -258,7 +258,7 @@ class CustomerResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => auth()->user()?->isAdmin()),
+                        ->visible(fn () => auth()->user()?->isAdmin() || auth()->user()?->isDataEntryManager() || auth()->user()?->isDataEntry()),
                         Tables\Actions\Action::make('Change Rejection Status')
                             ->icon('heroicon-o-x-circle')
                             ->hidden(fn($record) => $record->trashed())
@@ -329,9 +329,9 @@ class CustomerResource extends Resource
                     })
                     ->requiresConfirmation()
                     ->deselectRecordsAfterCompletion()
-                    ->visible(fn () => auth()->user()?->isAdmin()), 
+                    ->visible(fn () => auth()->user()?->isAdmin() || auth()->user()?->isDataEntryManager() || auth()->user()?->isDataEntry()), 
                 Tables\Actions\DeleteBulkAction::make()
-                    ->visible(fn () => auth()->user()?->isAdmin()), 
+                    ->visible(fn () => auth()->user()?->isAdmin() || auth()->user()?->isDataEntryManager() || auth()->user()?->isDataEntry()), 
             ]);
     }
 
@@ -355,10 +355,10 @@ class CustomerResource extends Resource
                     ->schema([
                         TextEntry::make('description'),
                     ]),
-                Section::make('Lead, Stage Information and Rejection Status')
+                Section::make('Lead Source, Status Information and Rejection Status')
                     ->schema([
                         TextEntry::make('leadSource.name'),
-                        TextEntry::make('pipelineStage.name'),
+                        TextEntry::make('pipelineStage.name')->label('Status'),
                         TextEntry::make('rejection_status')
                             ->label('Rejection Status')
                             ->formatStateUsing(fn($state) => $state ? ucfirst($state) : '-'),
@@ -390,10 +390,10 @@ class CustomerResource extends Resource
                             ])
                             ->columns()
                     ]),
-                Section::make('Pipeline Stage History and Notes')
+                Section::make('Status History and Notes')
                     ->schema([
                         ViewEntry::make('pipelineStageLogs')
-                            ->label('')
+                            ->label('Status')
                             ->view('infolists.components.pipeline-stage-history-list')
                     ])
                     ->collapsible(),
@@ -532,19 +532,24 @@ class CustomerResource extends Resource
         ];
     }
 
+
+        public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
+
+      public static function canView(Model $record): bool
+    {
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry() || auth()->user()->isSales();
+    }
+
     public static function canEdit(Model $record): bool
     {
-        if (!auth()->user()->isAdmin()) {
-            return false;
-        }
-        return true;
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry();
     }
 
     public static function canDelete(Model $record): bool
     {
-        if (!auth()->user()->isAdmin()) {
-            return false;
-        }
-        return true;
+        return auth()->user()->isAdmin() || auth()->user()->isDataEntryManager();
     }
 }

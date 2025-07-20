@@ -16,7 +16,7 @@ class TaskCalendarWidget extends FullCalendarWidget
         $tasks = Task::query()
             ->where('due_date_time', '>=', $fetchInfo['start'])
             ->where('due_date_time', '<=', $fetchInfo['end'])
-            ->when(!auth()->user()->isAdmin(), function ($query) {
+            ->when(auth()->user()->isSales(), function ($query) {
                 return $query->where('user_id', auth()->id());
             })
             ->get()
@@ -29,7 +29,7 @@ class TaskCalendarWidget extends FullCalendarWidget
                             ->start($task->due_date_time)
                             ->end($task->due_date_time),
                         function ($event) use ($task) {
-                            if (auth()->user()->isAdmin()) {
+                            if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager() || auth()->user()->isDataEntry()) {
                                 $event->url(TaskResource::getUrl('edit', [$task->getKey()]));
                             }
                         }
@@ -41,7 +41,7 @@ class TaskCalendarWidget extends FullCalendarWidget
         $notes = Note::query()
             ->where('due_date_time', '>=', $fetchInfo['start'])
             ->where('due_date_time', '<=', $fetchInfo['end'])
-            ->when(!auth()->user()->isAdmin(), function ($query) {
+            ->when(auth()->user()->isSales(), function ($query) {
                 return $query->where('created_by', auth()->id());
             })
             ->get()

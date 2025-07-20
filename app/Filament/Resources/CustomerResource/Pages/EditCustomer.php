@@ -12,8 +12,11 @@ class EditCustomer extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        if (auth()->user()->isAdmin() || auth()->user()->isDataEntryManager()) {
+            return [
+                Actions\DeleteAction::make(),
+            ];
+        }
+        return [];
     }
 }
